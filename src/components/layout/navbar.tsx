@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { UserButton, useUser } from "@clerk/nextjs"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Plane, Zap } from "lucide-react"
@@ -15,7 +14,6 @@ const navLinks = [
 
 export function Navbar() {
   const pathname = usePathname()
-  const { isSignedIn } = useUser()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-white/80 backdrop-blur-sm">
@@ -50,23 +48,12 @@ export function Navbar() {
               <Zap className="h-3.5 w-3.5" />
               <span>3 credits</span>
             </div>
-            {isSignedIn ? (
-              <>
-                <Button size="sm" asChild>
-                  <Link href="/upload">New Project</Link>
-                </Button>
-                <UserButton />
-              </>
-            ) : (
-              <>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/sign-in">Sign In</Link>
-                </Button>
-                <Button size="sm" asChild>
-                  <Link href="/sign-up">Get Started</Link>
-                </Button>
-              </>
-            )}
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/sign-in">Sign In</Link>
+            </Button>
+            <Button size="sm" asChild>
+              <Link href="/upload">New Project</Link>
+            </Button>
           </div>
         </div>
       </div>
