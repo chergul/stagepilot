@@ -49,27 +49,38 @@ export default function UploadPage() {
     const localUrl = URL.createObjectURL(file)
     setOriginalImage(localUrl)
     setStep("analyzing")
-    setProgress(30)
-    setStatusText("Analyzing your photo...")
+    setProgress(20)
+    setStatusText("Uploading your photo...")
 
-    await new Promise((r) => setTimeout(r, 1500))
-    setProgress(100)
+    try {
+      // Upload to fal.ai storage so AI can access it
+      const formData = new FormData()
+      formData.append("file", file)
+      const uploadRes = await fetch("/api/upload-image", { method: "POST", body: formData })
+      const { url, error: uploadError } = await uploadRes.json()
+      if (!uploadRes.ok) throw new Error(uploadError || "Upload failed")
 
-    // Mock analysis — replace with real vision API
-    const mockAnalysis: AnalysisResult = {
-      roomType: "living_room",
-      furnitureDetected: true,
-      furnitureCount: 5,
-      furnitureItems: ["sofa", "coffee table", "armchair", "lamp", "bookshelf"],
-      lightCondition: "bright",
-      qualityScore: 87,
+      setProgress(70)
+      setStatusText("Analyzing your photo...")
+      await new Promise((r) => setTimeout(r, 800))
+      setProgress(100)
+
+      const mockAnalysis: AnalysisResult = {
+        roomType: "living_room",
+        furnitureDetected: true,
+        furnitureCount: 5,
+        furnitureItems: ["sofa", "coffee table", "armchair", "lamp", "bookshelf"],
+        lightCondition: "bright",
+        qualityScore: 87,
+      }
+
+      setUploadedImageUrl(url)
+      setAnalysis(mockAnalysis)
+      setStep("furniture_decision")
+    } catch (err) {
+      setError(String(err))
+      setStep("upload")
     }
-
-    // Store the object URL as the working image URL for now
-    // In production this would be the R2 URL after upload
-    setUploadedImageUrl(localUrl)
-    setAnalysis(mockAnalysis)
-    setStep("furniture_decision")
     setProgress(0)
   }
 
