@@ -2,9 +2,10 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { UserButton, useUser } from "@clerk/nextjs"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Sparkles, Zap } from "lucide-react"
+import { Plane, Zap } from "lucide-react"
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
@@ -14,6 +15,7 @@ const navLinks = [
 
 export function Navbar() {
   const pathname = usePathname()
+  const { isSignedIn } = useUser()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-white/80 backdrop-blur-sm">
@@ -21,9 +23,9 @@ export function Navbar() {
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
-              <Sparkles className="h-4 w-4 text-white" />
+              <Plane className="h-4 w-4 text-white" />
             </div>
-            <span className="text-lg font-bold text-zinc-900">StageAI</span>
+            <span className="text-lg font-bold text-zinc-900">StagePilot</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
@@ -48,9 +50,23 @@ export function Navbar() {
               <Zap className="h-3.5 w-3.5" />
               <span>3 credits</span>
             </div>
-            <Button size="sm" asChild>
-              <Link href="/upload">New Project</Link>
-            </Button>
+            {isSignedIn ? (
+              <>
+                <Button size="sm" asChild>
+                  <Link href="/upload">New Project</Link>
+                </Button>
+                <UserButton />
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/sign-in">Sign In</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link href="/sign-up">Get Started</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>

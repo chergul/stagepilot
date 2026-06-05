@@ -40,7 +40,7 @@ export default function HomePage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
               <Sparkles className="h-4 w-4 text-white" />
             </div>
-            <span className="text-lg font-bold text-zinc-900">StageAI</span>
+            <span className="text-lg font-bold text-zinc-900">StagePilot</span>
           </div>
           <nav className="hidden items-center gap-6 md:flex">
             <Link href="#features" className="text-sm text-zinc-600 hover:text-zinc-900">Features</Link>
@@ -143,7 +143,7 @@ export default function HomePage() {
       </main>
 
       <footer className="border-t border-zinc-100 py-10 text-center text-sm text-zinc-400">
-        © {new Date().getFullYear()} StageAI. All rights reserved.
+        © {new Date().getFullYear()} StagePilot. All rights reserved.
       </footer>
     </div>
   )
