@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { fal } from "@fal-ai/client"
-
-fal.config({ credentials: process.env.FAL_KEY })
+import { uploadToFalStorage } from "@/lib/fal"
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,7 +11,7 @@ export async function POST(req: NextRequest) {
     const file = formData.get("file") as File
     if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 })
 
-    const url = await fal.storage.upload(file)
+    const url = await uploadToFalStorage(file)
     return NextResponse.json({ url })
   } catch (err) {
     console.error("Upload error:", err)

@@ -1,25 +1,24 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createServiceClient } from "@/lib/supabase"
 import { removeFurnitureWithFal, virtualStageWithFal, convertToTwilightWithFal, enhancePhotoWithFal } from "@/lib/fal"
-import { uploadImageFromUrl, generateImageKey } from "@/lib/storage"
-import { CREDIT_COSTS } from "@/lib/constants"
 import { ProcessType } from "@/types"
 
 export async function POST(req: NextRequest) {
-  const { projectId, processType, roomType, designStyle, imageUrl, userId } = await req.json() as {
-    projectId: string
-    processType: ProcessType
-    roomType?: string
-    designStyle?: string
-    imageUrl: string
-    userId: string
-  }
-
-  if (!projectId || !processType || !imageUrl || !userId) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
-  }
-
   try {
+    if (!process.env.FAL_KEY) {
+      return NextResponse.json({ error: "FAL_KEY not configured" }, { status: 500 })
+    }
+
+    const { processType, roomType, designStyle, imageUrl } = await req.json() as {
+      processType: ProcessType
+      roomType?: string
+      designStyle?: string
+      imageUrl: string
+    }
+
+    if (!processType || !imageUrl) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    }
+
     let resultUrl: string
 
     switch (processType) {
@@ -43,6 +42,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ resultUrl })
   } catch (err) {
     console.error("Processing error:", err)
-    return NextResponse.json({ error: "Processing failed", details: String(err) }, { status: 500 })
+    return NextResponse.json({ error: String(err) }, { status: 500 })
   }
 }

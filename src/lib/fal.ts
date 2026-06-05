@@ -1,6 +1,8 @@
-import { fal } from "@fal-ai/client"
+import { createFalClient } from "@fal-ai/client"
 
-fal.config({ credentials: process.env.FAL_KEY })
+function getClient() {
+  return createFalClient({ credentials: process.env.FAL_KEY })
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getUrl(result: any, key: "image" | "images"): string {
@@ -8,12 +10,15 @@ function getUrl(result: any, key: "image" | "images"): string {
   return result.image.url
 }
 
+export async function uploadToFalStorage(file: File): Promise<string> {
+  const client = getClient()
+  return client.storage.upload(file)
+}
+
 export async function removeFurnitureWithFal(imageUrl: string): Promise<string> {
-  const result = await fal.subscribe("fal-ai/lama-cleaner/lama", {
-    input: {
-      image_url: imageUrl,
-      mask_url: imageUrl,
-    },
+  const client = getClient()
+  const result = await client.subscribe("fal-ai/lama-cleaner/lama", {
+    input: { image_url: imageUrl, mask_url: imageUrl },
   })
   return getUrl(result, "image")
 }
@@ -23,8 +28,9 @@ export async function virtualStageWithFal(
   roomType: string,
   style: string
 ): Promise<string> {
+  const client = getClient()
   const prompt = `A beautifully staged ${roomType.replace(/_/g, " ")} interior, ${style} design style, professional real estate photography, high quality, photorealistic, bright natural lighting, elegant furniture`
-  const result = await fal.subscribe("fal-ai/stable-diffusion-v3-medium/image-to-image", {
+  const result = await client.subscribe("fal-ai/stable-diffusion-v3-medium/image-to-image", {
     input: {
       image_url: imageUrl,
       prompt,
@@ -38,7 +44,8 @@ export async function virtualStageWithFal(
 }
 
 export async function convertToTwilightWithFal(imageUrl: string): Promise<string> {
-  const result = await fal.subscribe("fal-ai/stable-diffusion-v3-medium/image-to-image", {
+  const client = getClient()
+  const result = await client.subscribe("fal-ai/stable-diffusion-v3-medium/image-to-image", {
     input: {
       image_url: imageUrl,
       prompt: "exterior real estate photo at twilight dusk, golden hour warm sky, purple and orange clouds, interior lights on, professional real estate photography",
@@ -52,21 +59,12 @@ export async function convertToTwilightWithFal(imageUrl: string): Promise<string
 }
 
 export async function enhancePhotoWithFal(imageUrl: string): Promise<string> {
-  const result = await fal.subscribe("fal-ai/aura-sr", {
+  const client = getClient()
+  const result = await client.subscribe("fal-ai/aura-sr", {
     input: {
       image_url: imageUrl,
       upscale_factor: 2,
       overlapping_tiles: true,
-    },
-  })
-  return getUrl(result, "image")
-}
-
-export async function removeObjectWithFal(imageUrl: string, maskUrl: string): Promise<string> {
-  const result = await fal.subscribe("fal-ai/lama-cleaner/lama", {
-    input: {
-      image_url: imageUrl,
-      mask_url: maskUrl,
     },
   })
   return getUrl(result, "image")
